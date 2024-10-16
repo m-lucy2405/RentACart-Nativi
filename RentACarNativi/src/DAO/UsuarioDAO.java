@@ -19,81 +19,108 @@ import Database.ConexionDB;
  *
  * @author diego
  */
+
 public class UsuarioDAO {
-    
     private ConexionDB conexionDB;
 
-    public UsuarioDAO(ConexionDB ConexionDB) {
-        this.conexionDB = ConexionDB;
+    public UsuarioDAO() {
+        this.conexionDB = new ConexionDB();
     }
-      
-    
+
+    // Listar todos los usuarios
     public List<Usuario> listarUsuarios() {
-        List<Usuario> usuarios = new ArrayList<>();
         String query = "SELECT * FROM usuarios";
+        List<Usuario> usuarios = new ArrayList<>();
 
-        try (Connection conn = conexionDB.conectar(); 
-             PreparedStatement stmt = conn.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
+    try (Connection conn = conexionDB.conectar();
+         PreparedStatement stmt = conn.prepareStatement(query);
+         ResultSet rs = stmt.executeQuery()) {
 
-            while (rs.next()) {
-                Usuario usuario = new Usuario();
-                usuario.setId(rs.getInt("id"));
-                usuario.setNombre(rs.getString("nombre"));
+        while (rs.next()) {
+            Usuario usuario = new Usuario();
+            usuario.setId(rs.getInt("id_usuario"));
+            usuario.setNombre(rs.getString("nombre_usuario"));
+            usuario.setRol(rs.getString("rol"));
+            usuario.setContraseña(rs.getString("password_hash"));
+
+            usuarios.add(usuario);
+        }
+        } catch (SQLException e) {
+             e.printStackTrace();
+        }
+
+       return usuarios;
+   }
+  
+
+    // Buscar un usuario por su ID
+    public Usuario buscarUsuarioPorId(int id) {
+        String query = "SELECT * FROM usuarios WHERE id = ?";
+        Usuario usuario = null;
+
+        try (Connection conn = conexionDB.conectar();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                usuario = new Usuario();
+                usuario.setId(rs.getInt("id_usuario"));
+                usuario.setNombre(rs.getString("nombre_usuario"));
                 usuario.setRol(rs.getString("rol"));
-                usuario.setContraseña(rs.getString("contraseña"));
-                usuarios.add(usuario);
+                usuario.setContraseña(rs.getString("password_hash"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-
-    return usuarios;
-    
+        return usuario;
     }
 
-    public void insertarUsuario(Usuario usuario) {
-        
-        String query = "INSERT INTO usuarios (nombre, rol, contraseña) VALUES (?, ?, ?)";
+    // Insertar un nuevo usuario
+    public boolean insertarUsuario(Usuario usuario) {
+        String query = "INSERT INTO usuarios (nombre_usuario, rol, password_hash) VALUES (?, ?, ?)";
         try (Connection conn = conexionDB.conectar();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-
             stmt.setString(1, usuario.getNombre());
             stmt.setString(2, usuario.getRol());
             stmt.setString(3, usuario.getContraseña());
             stmt.executeUpdate();
+            return true;
         } catch (SQLException e) {
-            e.printStackTrace(); // Manejo de excepciones
+            e.printStackTrace();
+            return false;
         }
     }
-  
 
-    public void actualizarUsuario(Usuario usuario) {
-        String query = "UPDATE usuarios SET nombre = ?, rol = ?, contraseña = ? WHERE id = ?";
+    // Actualizar un usuario
+    public boolean actualizarUsuario(Usuario usuario) {
+        String query = "UPDATE usuarios SET nombre_usuario = ?, rol = ?, password_hash = ? WHERE id_usuario = ?";
         try (Connection conn = conexionDB.conectar();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-
             stmt.setString(1, usuario.getNombre());
             stmt.setString(2, usuario.getRol());
             stmt.setString(3, usuario.getContraseña());
             stmt.setInt(4, usuario.getId());
             stmt.executeUpdate();
+            return true;
         } catch (SQLException e) {
-            e.printStackTrace(); // Manejo de excepciones
+            e.printStackTrace();
+            return false;
         }
     }
 
-    public void eliminarUsuario(int id) {
-        String query = "DELETE FROM usuarios WHERE id = ?";
+    // Eliminar un usuario
+    public boolean eliminarUsuario(int id) {
+        String query = "DELETE FROM usuarios WHERE id_usuario = ?";
         try (Connection conn = conexionDB.conectar();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-
             stmt.setInt(1, id);
             stmt.executeUpdate();
+            return true;
         } catch (SQLException e) {
-            e.printStackTrace(); // Manejo de excepciones
+            e.printStackTrace();
+            return false;
         }
     }
-    
 }

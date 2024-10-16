@@ -16,7 +16,7 @@ import java.sql.SQLException;
 public class ConexionDB {
     private static final String URL = "jdbc:postgresql://localhost:5432/Db_RentACar_Nativi"; // Cambia esto según tu configuración
     private static final String USER = "postgres"; // Cambia esto por tu usuario
-    private static final String PASSWORD = "diego123"; // Cambia esto por tu contraseña
+    private static final String PASSWORD = "morataya123"; // Cambia esto por tu contraseña
 
     public Connection conectar() {
         Connection conn = null;
