@@ -123,5 +123,40 @@ public class CuentaContable {
         }
         return false;
     }
+
+    public static CuentaContable obtenerCuentaPorId(int idCuenta) {
+        CuentaContable cuenta = null;
+
+        // SQL para obtener una cuenta por ID
+        String sql = "SELECT * FROM cuentas_contables WHERE id_cuenta = ?";
+
+        try (PreparedStatement stmt = Conexion.getConnection().prepareStatement(sql)) {
+            // Establecer el parámetro en la consulta
+            stmt.setInt(1, idCuenta);
+
+            // Ejecutar la consulta y obtener los resultados
+            ResultSet rs = stmt.executeQuery();
+
+            // Si encontramos la cuenta, la creamos
+            if (rs.next()) {
+                cuenta = new CuentaContable(
+                    rs.getString("nombre_cuenta"),
+                    rs.getString("tipo_cuenta"),
+                    rs.getString("codigo_cuenta"),
+                    rs.getDouble("saldo_inicial"),
+                    rs.getBoolean("estado")
+                );
+                cuenta.setIdCuenta(rs.getInt("id_cuenta"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();  // En producción, debes manejar mejor las excepciones
+        }
+
+        return cuenta;
+    }
+
+    
+    
 }
 

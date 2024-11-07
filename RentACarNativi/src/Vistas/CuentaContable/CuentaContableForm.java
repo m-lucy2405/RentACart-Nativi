@@ -5,6 +5,7 @@
 package Vistas.CuentaContable;
 
 import Models.CuentaContable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -16,7 +17,10 @@ import javax.swing.table.DefaultTableModel;
 public class CuentaContableForm extends javax.swing.JFrame {
 
     
-    private Integer idCuentaSeleccionada = null;
+    
+    private ArrayList<CuentaContable> cuentas;  // Lista para almacenar las cuentas
+    private CuentaContable cuentaSeleccionada = null;
+    private int idCuentaSeleccionada;
     /**
      * Creates new form CuentaContableForm
      */
@@ -24,6 +28,7 @@ public class CuentaContableForm extends javax.swing.JFrame {
         initComponents();
        cargarCuentasEnTabla();
         llenarComboBoxes();
+        cuentas = new ArrayList<>(); 
     }
     
     // Método para llenar los ComboBox
@@ -74,7 +79,7 @@ private void guardarCuenta() {
     cuenta.setEstado(estado);
 
     try {
-        if (idCuentaSeleccionada == null) {
+        if (idCuentaSeleccionada == 0) {
             // Creación de nuevo registro
             cuenta.guardar();
         } else {
@@ -90,15 +95,50 @@ private void guardarCuenta() {
     }
 }
 
+private void editarCuenta() {
+       int filaSeleccionada = tablaCuentas.getSelectedRow();
+    if (filaSeleccionada != -1) {
+        // Obtener la cuenta seleccionada directamente de la tabla
+        int idCuenta = (int) tablaCuentas.getValueAt(filaSeleccionada, 0);
+        CuentaContable cuentaSeleccionada = CuentaContable.obtenerCuentaPorId(idCuenta);
 
+        // Llenar los campos del formulario con los datos de la cuenta seleccionada
+        cargarDatosCuenta(cuentaSeleccionada);
 
+        // Asignar el ID de la cuenta seleccionada a la variable idCuentaSeleccionada
+        idCuentaSeleccionada = cuentaSeleccionada.getIdCuenta();
+    }
+}
+
+ private void eliminarCuenta(){
+       // Obtener el índice de la fila seleccionada en la tabla
+    int filaSeleccionada = tablaCuentas.getSelectedRow();
+
+    if (filaSeleccionada != -1) {  // Si hay una fila seleccionada
+        // Obtener el ID de la cuenta seleccionada
+        int idCuenta = (int) tablaCuentas.getValueAt(filaSeleccionada, 0);  // Suponiendo que el ID está en la primera columna
+
+        // Llamar al método para eliminar la cuenta
+        boolean eliminado = CuentaContable.eliminarCuenta(idCuenta);
+
+        if (eliminado) {
+            JOptionPane.showMessageDialog(null, "Cuenta eliminada exitosamente.");
+            // Actualizar la tabla después de eliminar la cuenta
+            actualizarTabla();
+        } else {
+            JOptionPane.showMessageDialog(null, "No se pudo eliminar la cuenta.");
+        }
+    } else {
+        JOptionPane.showMessageDialog(null, "Por favor, selecciona una cuenta para eliminar.");
+    }
+ }
 
 // Método de cargar datos en la tabla después de cualquier cambio
 private void cargarDatosEnTabla() {
     DefaultTableModel modelo = (DefaultTableModel) tablaCuentas.getModel();
-    modelo.setRowCount(0); // Limpia la tabla
+    modelo.setRowCount(0);
 
-    List<CuentaContable> cuentas = CuentaContable.obtenerCuentas();
+    cuentas = (ArrayList<CuentaContable>) CuentaContable.obtenerCuentas();  // Actualizar la lista
     for (CuentaContable cuenta : cuentas) {
         modelo.addRow(new Object[]{
             cuenta.getIdCuenta(),
@@ -153,6 +193,8 @@ private void limpiarCampos() {
 }
 
 
+
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -188,6 +230,11 @@ private void limpiarCampos() {
             }
         ));
         tablaCuentas.getTableHeader().setReorderingAllowed(false);
+        tablaCuentas.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tablaCuentasMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tablaCuentas);
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
@@ -275,6 +322,7 @@ private void limpiarCampos() {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
        guardarCuenta();
        limpiarCampos();
@@ -282,50 +330,20 @@ private void limpiarCampos() {
     }//GEN-LAST:event_btnAgregarActionPerformed
 
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
-        // Obtener el índice de la fila seleccionada en la tabla
-    int filaSeleccionada = tablaCuentas.getSelectedRow();
-
-    if (filaSeleccionada != -1) {  // Si hay una fila seleccionada
-        // Obtener el ID de la cuenta seleccionada
-        int idCuenta = (int) tablaCuentas.getValueAt(filaSeleccionada, 0);  // Suponiendo que el ID está en la primera columna
-
-        // Buscar la cuenta por ID en la base de datos
-        CuentaContable cuenta = CuentaContable.obtenerCuentas().stream()
-            .filter(c -> c.getIdCuenta() == idCuenta)
-            .findFirst()
-            .orElse(null);
-
-        if (cuenta != null) {
-            // Llenar el formulario con los datos de la cuenta seleccionada
-            cargarDatosCuenta(cuenta);  // Este método llena los campos del formulario
-        }
-    } else {
-        JOptionPane.showMessageDialog(null, "Por favor, selecciona una cuenta para editar.");
-    }
+                guardarCuenta();
+                limpiarCampos();
+                actualizarTabla();
     }//GEN-LAST:event_btnEditarActionPerformed
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
-        // Obtener el índice de la fila seleccionada en la tabla
-    int filaSeleccionada = tablaCuentas.getSelectedRow();
-
-    if (filaSeleccionada != -1) {  // Si hay una fila seleccionada
-        // Obtener el ID de la cuenta seleccionada
-        int idCuenta = (int) tablaCuentas.getValueAt(filaSeleccionada, 0);  // Suponiendo que el ID está en la primera columna
-
-        // Llamar al método para eliminar la cuenta
-        boolean eliminado = CuentaContable.eliminarCuenta(idCuenta);
-
-        if (eliminado) {
-            JOptionPane.showMessageDialog(null, "Cuenta eliminada exitosamente.");
-            // Actualizar la tabla después de eliminar la cuenta
-            actualizarTabla();
-        } else {
-            JOptionPane.showMessageDialog(null, "No se pudo eliminar la cuenta.");
-        }
-    } else {
-        JOptionPane.showMessageDialog(null, "Por favor, selecciona una cuenta para eliminar.");
-    }
+          eliminarCuenta();
+          actualizarTabla();
+          limpiarCampos();
     }//GEN-LAST:event_btnEliminarActionPerformed
+
+    private void tablaCuentasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaCuentasMouseClicked
+          editarCuenta();
+    }//GEN-LAST:event_tablaCuentasMouseClicked
 
     /**
      * @param args the command line arguments
