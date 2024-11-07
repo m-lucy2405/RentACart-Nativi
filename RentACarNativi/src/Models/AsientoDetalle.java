@@ -1,73 +1,128 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Models;
 
-/**
- *
- * @author diego
- */
+import Database.Conexion;
+import java.sql.*;
+import java.util.ArrayList;
+
 public class AsientoDetalle {
-    
-       private int id;
-       private int asientoId;
-       private int cuentaId;
-       private double montoDebe;
-       private double montoHaber;
+    private int idDetalleAsiento;
+    private int idAsiento;
+    private int idCuenta;
+    private double montoDebito;
+    private double montoCredito;
 
-    public AsientoDetalle(int id, int asientoId, int cuentaId, double montoDebe, double montoHaber) {
-        this.id = id;
-        this.asientoId = asientoId;
-        this.cuentaId = cuentaId;
-        this.montoDebe = montoDebe;
-        this.montoHaber = montoHaber;
+    // Constructores
+    public AsientoDetalle(int idAsiento, int idCuenta, double montoDebito, double montoCredito) {
+        this.idAsiento = idAsiento;
+        this.idCuenta = idCuenta;
+        this.montoDebito = montoDebito;
+        this.montoCredito = montoCredito;
     }
 
-    public int getId() {
-        return id;
+    public AsientoDetalle(int idDetalleAsiento, int idAsiento, int idCuenta, double montoDebito, double montoCredito) {
+        this.idDetalleAsiento = idDetalleAsiento;
+        this.idAsiento = idAsiento;
+        this.idCuenta = idCuenta;
+        this.montoDebito = montoDebito;
+        this.montoCredito = montoCredito;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    // Getters y Setters
+    public int getIdDetalleAsiento() { return idDetalleAsiento; }
+    public int getIdAsiento() { return idAsiento; }
+    public int getIdCuenta() { return idCuenta; }
+    public double getMontoDebito() { return montoDebito; }
+    public double getMontoCredito() { return montoCredito; }
+
+    public void setIdDetalleAsiento(int idDetalleAsiento) { this.idDetalleAsiento = idDetalleAsiento; }
+    public void setIdAsiento(int idAsiento) { this.idAsiento = idAsiento; }
+    public void setIdCuenta(int idCuenta) { this.idCuenta = idCuenta; }
+    public void setMontoDebito(double montoDebito) { this.montoDebito = montoDebito; }
+    public void setMontoCredito(double montoCredito) { this.montoCredito = montoCredito; }
+
+    // Método para guardar un nuevo detalle
+    public boolean guardar() {
+        String sql = "INSERT INTO DetalleAsientos (id_asiento, id_cuenta, monto_debito, monto_credito) VALUES (?, ?, ?, ?)";
+        try (Connection conn = Conexion.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, this.idAsiento);
+            ps.setInt(2, this.idCuenta);
+            ps.setDouble(3, this.montoDebito);
+            ps.setDouble(4, this.montoCredito);
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
-    public int getAsientoId() {
-        return asientoId;
+    // Método para actualizar un detalle existente
+    public boolean actualizar() {
+        String sql = "UPDATE DetalleAsientos SET id_asiento = ?, id_cuenta = ?, monto_debito = ?, monto_credito = ? WHERE id_detalle_asiento = ?";
+        try (Connection conn = Conexion.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, this.idAsiento);
+            ps.setInt(2, this.idCuenta);
+            ps.setDouble(3, this.montoDebito);
+            ps.setDouble(4, this.montoCredito);
+            ps.setInt(5, this.idDetalleAsiento);
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
-    public void setAsientoId(int asientoId) {
-        this.asientoId = asientoId;
+    // Método para eliminar un detalle
+    public static boolean eliminar(int id) {
+        String sql = "DELETE FROM DetalleAsientos WHERE id_detalle_asiento = ?";
+        try (Connection conn = Conexion.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
-    public int getCuentaId() {
-        return cuentaId;
+    // Método para obtener todos los detalles
+    public static ArrayList<AsientoDetalle> obtenerTodos() {
+        ArrayList<AsientoDetalle> detalles = new ArrayList<>();
+        String sql = "SELECT * FROM DetalleAsientos";
+        try (Connection conn = Conexion.getConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                int idDetalleAsiento = rs.getInt("id_detalle_asiento");
+                int idAsiento = rs.getInt("id_asiento");
+                int idCuenta = rs.getInt("id_cuenta");
+                double montoDebito = rs.getDouble("monto_debito");
+                double montoCredito = rs.getDouble("monto_credito");
+
+                detalles.add(new AsientoDetalle(idDetalleAsiento, idAsiento, idCuenta, montoDebito, montoCredito));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return detalles;
     }
 
-    public void setCuentaId(int cuentaId) {
-        this.cuentaId = cuentaId;
-    }
+    // Método para obtener un detalle específico por ID
+    public static AsientoDetalle obtenerPorId(int id) {
+        String sql = "SELECT * FROM DetalleAsientos WHERE id_detalle_asiento = ?";
+        try (Connection conn = Conexion.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                int idAsiento = rs.getInt("id_asiento");
+                int idCuenta = rs.getInt("id_cuenta");
+                double montoDebito = rs.getDouble("monto_debito");
+                double montoCredito = rs.getDouble("monto_credito");
 
-    public double getMontoDebe() {
-        return montoDebe;
+                return new AsientoDetalle(id, idAsiento, idCuenta, montoDebito, montoCredito);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
-
-    public void setMontoDebe(double montoDebe) {
-        this.montoDebe = montoDebe;
-    }
-
-    public double getMontoHaber() {
-        return montoHaber;
-    }
-
-    public void setMontoHaber(double montoHaber) {
-        this.montoHaber = montoHaber;
-    }
-
-    @Override
-    public String toString() {
-        return "AsientoDetalle{" + "id=" + id + ", asientoId=" + asientoId + ", cuentaId=" + cuentaId + ", montoDebe=" + montoDebe + ", montoHaber=" + montoHaber + '}';
-    }
-       
-       
 }
