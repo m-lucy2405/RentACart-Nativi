@@ -7,6 +7,7 @@ package Vistas.CuentaContable;
 import Models.CuentaContable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -26,6 +27,7 @@ public class CuentaContableForm extends javax.swing.JFrame {
      */
     public CuentaContableForm() {
         initComponents();
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
        cargarCuentasEnTabla();
         llenarComboBoxes();
         cuentas = new ArrayList<>(); 
