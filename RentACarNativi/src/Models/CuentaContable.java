@@ -32,6 +32,10 @@ public class CuentaContable {
     this.estado = estado;
     }
 
+    CuentaContable(int idCuenta) {
+        this.idCuenta = idCuenta;
+    }
+
     // Getters y Setters
     public int getIdCuenta() { return idCuenta; }
     public void setIdCuenta(int idCuenta) { this.idCuenta = idCuenta; }

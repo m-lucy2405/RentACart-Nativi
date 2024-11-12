@@ -7,7 +7,7 @@ package Vista;
 import Vistas.AsientoContable.AsientoContableForm;
 import Vistas.AsientoDetalle.AsientoDetalleForm;
 import Vistas.CuentaContable.CuentaContableForm;
-import Vistas.CuentaT.CuentaTForm;
+import Vistas.CuentaT.CuentaTForm2;
 import javax.swing.JFrame;
 
 /**
@@ -143,7 +143,7 @@ public class Principal extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        CuentaTForm cuentat = new CuentaTForm();
+        CuentaTForm2 cuentat = new CuentaTForm2();
         cuentat.setVisible(true);
     }//GEN-LAST:event_jButton4ActionPerformed
 
