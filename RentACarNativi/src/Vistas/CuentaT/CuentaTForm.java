@@ -43,16 +43,55 @@ model.addColumn("Saldo Final");
 model.addColumn("Fecha Generación");
 
 tableCuentasT.setModel(model); // miTabla es tu JTable
+
+
+ // Inicialización de los componentes
+        jDateChooserInicio = new com.toedter.calendar.JDateChooser();
+        jDateChooserFin = new com.toedter.calendar.JDateChooser();
+
+        // Configuración de los JDateChooser
+        jDateChooserInicio.setDateFormatString("dd/MM/yyyy");
+        jDateChooserFin.setDateFormatString("dd/MM/yyyy");
     }
     
     
-private java.sql.Date obtenerFechaSQL(JDateChooser dateChooser) {
-    java.util.Date fechaUtil = fechaInicio.getDate();
-    if (fechaUtil != null) {
-        return new java.sql.Date(fechaUtil.getTime()); // Convertir a java.sql.Date
-    } else {
-        JOptionPane.showMessageDialog(null, "Por favor, selecciona una fecha.");
-        return null; // Devolver null si la fecha no es válida
+
+// Código del botón "Generar Cuentas T"
+public void botonGenerarCuentasT() {
+    Date fechaInicio = jDateChooserInicio.getDate();
+    Date fechaFin = jDateChooserFin.getDate();
+    
+        
+    // Primero, borramos las cuentas T temporales existentes
+    CuentaT.borrarCuentasTemporales();
+    
+    // Convertir las fechas de java.util.Date a java.sql.Date
+java.sql.Date sqlFechaInicio = new java.sql.Date(fechaInicio.getTime());
+java.sql.Date sqlFechaFin = new java.sql.Date(fechaFin.getTime());
+    
+    // Luego, generamos las nuevas cuentas T
+   CuentaT.generarCuentasTemporales(sqlFechaInicio, sqlFechaFin);
+    
+    // Finalmente, actualizamos la tabla en el formulario
+    cargarCuentasTemporales();
+}
+
+// Método para cargar las cuentas T temporales en la tabla
+public void cargarCuentasTemporales() {
+    ArrayList<CuentaT> cuentasT = CuentaT.obtenerCuentasTemporales();
+    DefaultTableModel model = (DefaultTableModel) tableCuentasT.getModel();
+    model.setRowCount(0);  // Limpiar la tabla
+    
+    for (CuentaT cuenta : cuentasT) {
+        model.addRow(new Object[]{
+            cuenta.getId(), 
+            cuenta.getIdCuenta(), 
+            cuenta.getMes(), 
+            cuenta.getTotalDebitos(),
+            cuenta.getTotalCreditos(),
+            cuenta.getSaldoFinal(),
+            cuenta.getFechaGeneracion()
+        });
     }
 }
 
@@ -159,20 +198,7 @@ private java.sql.Date obtenerFechaSQL(JDateChooser dateChooser) {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnGenerarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerarActionPerformed
-           // Obtener las fechas desde los JDateChooser
-    java.sql.Date fechaInicio = obtenerFechaSQL(jDateChooserInicio);  // Pasa el JDateChooser
-    java.sql.Date fechaFin = obtenerFechaSQL(jDateChooserFin);        // Pasa el JDateChooser
-
-    // Verificar si las fechas no son nulas
-    if (fechaInicio != null && fechaFin != null) {
-        // Llamar al método para insertar los datos temporales en la base de datos
-        CuentaT.insertarCuentasTemporales(fechaInicio, fechaFin);
-
-        // Llamar al método para cargar los datos temporales en la tabla
-        CuentaT.cargarCuentasTemporales(tableCuentasT); // miTabla es tu JTable
-    } else {
-        JOptionPane.showMessageDialog(null, "Por favor, selecciona las fechas.");
-    }
+          botonGenerarCuentasT();
     }//GEN-LAST:event_btnGenerarActionPerformed
 
     /**

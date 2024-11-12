@@ -2,24 +2,33 @@ package Models;
 
 import Database.Conexion;
 import java.sql.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
 
 public class CuentaT {
     
-     private int id;
+    private int id;
     private int idCuenta;
     private String mes;
     private double totalDebitos;
     private double totalCreditos;
     private double saldoFinal;
     private Date fechaGeneracion;
+
+    // Constructor vacío
+    public CuentaT() {
+    }
+
+    // Constructor con parámetros
+    public CuentaT(int id, int idCuenta, String mes, double totalDebitos, double totalCreditos, double saldoFinal, Date fechaGeneracion) {
+        this.id = id;
+        this.idCuenta = idCuenta;
+        this.mes = mes;
+        this.totalDebitos = totalDebitos;
+        this.totalCreditos = totalCreditos;
+        this.saldoFinal = saldoFinal;
+        this.fechaGeneracion = fechaGeneracion;
+    }
 
     // Getters y setters
 
@@ -79,72 +88,68 @@ public class CuentaT {
         this.fechaGeneracion = fechaGeneracion;
     }
 
+    // Método para borrar las cuentas T temporales
+    public static void borrarCuentasTemporales() {
+        String sql = "DELETE FROM cuentas_t_mensuales WHERE es_temporal = true";
+        try (Connection conn = Conexion.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
-public static void insertarCuentasTemporales(Date fechaInicio, Date fechaFin) {
-    // Asegúrate de tener la conexión establecida
-    String sql = "INSERT INTO cuentas_t_mensuales (id_cuenta_tm, id_cuenta, mes, total_debitos, total_creditos, saldo_final, fecha_generacion, es_temporal) "
-               + "SELECT id_cuenta_tm, id_cuenta, mes, total_debitos, total_creditos, saldo_final, fecha_generacion, ? "
-               + "FROM cuentas_t_mensuales "
-               + "WHERE fecha_generacion BETWEEN ? AND ? AND es_temporal = false";
-
-    try (Connection conn = Conexion.getConnection();
-         PreparedStatement pst = conn.prepareStatement(sql)) {
-
-        // Convertir las fechas a formato SQL
-        java.sql.Date sqlFechaInicio = new java.sql.Date(fechaInicio.getTime());
-        java.sql.Date sqlFechaFin = new java.sql.Date(fechaFin.getTime());
-
-        // Establecer los parámetros de la consulta
-        pst.setBoolean(1, true); // es_temporal = true
-        pst.setDate(2, sqlFechaInicio); // fecha_inicio
-        pst.setDate(3, sqlFechaFin); // fecha_fin
-
-        // Ejecutar la consulta
-        int rowsAffected = pst.executeUpdate();
+    // Método para generar y guardar las cuentas T temporales
+    public static void generarCuentasTemporales(Date fechaInicio, Date fechaFin) {
+        String sql = "INSERT INTO cuentas_t_mensuales (id_cuenta, mes, total_debitos, total_creditos, saldo_final, fecha_generacion, es_temporal) "
+                     + "SELECT c.id_cuenta, a.mes, SUM(a.total_debitos), SUM(a.total_creditos), SUM(a.saldo_final), CURRENT_DATE, true "
+                     + "FROM cuentas c "
+                     + "JOIN asientos a ON c.id_cuenta = a.id_cuenta "
+                     + "WHERE a.fecha_asiento BETWEEN ? AND ? "
+                     + "GROUP BY c.id_cuenta, a.mes";
         
-        // Verifica si se insertaron registros
-        if (rowsAffected > 0) {
-            JOptionPane.showMessageDialog(null, "Datos temporales guardados correctamente");
-        } else {
-            JOptionPane.showMessageDialog(null, "No se insertaron registros");
+        try (Connection conn = Conexion.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            // Convertir fechas a SQL Date
+            java.sql.Date sqlFechaInicio = new java.sql.Date(fechaInicio.getTime());
+            java.sql.Date sqlFechaFin = new java.sql.Date(fechaFin.getTime());
+            
+            stmt.setDate(1, sqlFechaInicio);
+            stmt.setDate(2, sqlFechaFin);
+            
+            stmt.executeUpdate();
+            JOptionPane.showMessageDialog(null, "Cuentas T generadas temporalmente.");
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error al generar las cuentas T: " + e.getMessage());
         }
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(null, "Error al guardar los datos temporales: " + e.getMessage());
+    }
+
+    // Método para obtener las cuentas T temporales desde la base de datos
+    public static ArrayList<CuentaT> obtenerCuentasTemporales() {
+        ArrayList<CuentaT> cuentas = new ArrayList<>();
+        String sql = "SELECT id_cuenta_tm, id_cuenta, mes, total_debitos, total_creditos, saldo_final, fecha_generacion "
+                     + "FROM cuentas_t_mensuales WHERE es_temporal = true";
+        
+        try (Connection conn = Conexion.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            
+            while (rs.next()) {
+                CuentaT cuenta = new CuentaT();
+                cuenta.setId(rs.getInt("id_cuenta_tm"));
+                cuenta.setIdCuenta(rs.getInt("id_cuenta"));
+                cuenta.setMes(rs.getString("mes"));
+                cuenta.setTotalDebitos(rs.getDouble("total_debitos"));
+                cuenta.setTotalCreditos(rs.getDouble("total_creditos"));
+                cuenta.setSaldoFinal(rs.getDouble("saldo_final"));
+                cuenta.setFechaGeneracion(rs.getDate("fecha_generacion"));
+                cuentas.add(cuenta);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return cuentas;
     }
 }
 
-
-
-    public static void cargarCuentasTemporales(JTable table) {
-    // Limpiar la tabla antes de cargar nuevos datos
-    DefaultTableModel model = (DefaultTableModel) table.getModel();
-    model.setRowCount(0); // Limpiar la tabla antes de cargar nuevos registros
-
-    String sql = "SELECT id_cuenta_tm, id_cuenta, mes, total_debitos, total_creditos, saldo_final, fecha_generacion "
-               + "FROM cuentas_t_mensuales "
-               + "WHERE es_temporal = true";
-
-    try (Connection conn = Conexion.getConnection();
-         PreparedStatement pst = conn.prepareStatement(sql);
-         ResultSet rs = pst.executeQuery()) {
-
-        // Iterar sobre los resultados y llenar la tabla
-        while (rs.next()) {
-            Object[] row = {
-                rs.getInt("id_cuenta_tm"),
-                rs.getInt("id_cuenta"),
-                rs.getString("mes"),
-                rs.getDouble("total_debitos"),
-                rs.getDouble("total_creditos"),
-                rs.getDouble("saldo_final"),
-                rs.getDate("fecha_generacion")
-            };
-            model.addRow(row);
-        }
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(null, "Error al cargar los datos: " + e.getMessage());
-    }
-}
-
-
-}
