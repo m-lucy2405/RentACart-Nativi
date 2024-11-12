@@ -158,9 +158,6 @@ public class CuentaContable {
         }
 
         return cuenta;
-    }
-
-    
-    
+    }  
 }
 

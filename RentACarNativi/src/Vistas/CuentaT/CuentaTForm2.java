@@ -28,7 +28,7 @@ public class CuentaTForm2 extends javax.swing.JFrame {
      */
     
    
-   
+    private ArrayList<CuentaContable> cuentasT;  // Lista para almacenar las cuentas
     
     public CuentaTForm2() {
         initComponents();
@@ -123,15 +123,12 @@ public class CuentaTForm2 extends javax.swing.JFrame {
 
     
 public void cargarCuentasTemporales() {
-    // Obtener las cuentas temporales
-    ArrayList<CuentaT> cuentasT = CuentaT.cargarCuentasTemporales(idCuenta);
-
     // Limpiar la tabla antes de cargar nuevos datos
     DefaultTableModel model = (DefaultTableModel) tableCuentasT.getModel();
     model.setRowCount(0);
-
-    // Verificar si cuentasT tiene datos y agregarlos a la tabla
-    if (cuentasT != null && !cuentasT.isEmpty()) {
+    
+    // Obtener las cuentas temporales
+         ArrayList<CuentaT> cuentasT = CuentaT.cargarCuentasTemporales(idCuenta);
         for (CuentaT cuenta : cuentasT) {
             model.addRow(new Object[]{
                 cuenta.getId(),
@@ -143,9 +140,6 @@ public void cargarCuentasTemporales() {
                 cuenta.getFechaGeneracion()
             });
         }
-    } else {
-        System.out.println("No se encontraron cuentas temporales.");
-    }
 }
 
 
