@@ -28,8 +28,12 @@ public class AsientoDetalle {
     }
 
     public AsientoDetalle(int idAsiento, int idCuenta, double montoDebito, double montoCredito) {
-       
-    }
+    this.idAsiento = idAsiento;
+    this.idCuenta = idCuenta;
+    this.montoDebito = montoDebito;
+    this.montoCredito = montoCredito;
+}
+
 
     // Getters y Setters
 

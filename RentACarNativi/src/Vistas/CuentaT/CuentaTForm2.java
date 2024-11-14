@@ -104,7 +104,7 @@ public void cargarDatosEnTabla() {
 
     // Crear las columnas para el JTable
     String[] columnNames = {"ID Temporal", "ID Cuenta", "Nombre Cuenta",  "Fecha Asiento", "Descripción Asiento", "Débito", "Crédito", "Saldo Final",  "Fecha Generación"};
-
+    
     // Crear el modelo de la tabla con las columnas y las filas
     Object[][] rowData = new Object[cuentasT.size()][columnNames.length];
 
@@ -128,6 +128,17 @@ public void cargarDatosEnTabla() {
 
     // Asignar el modelo a la tabla
     tableCuentasT.setModel(model);
+    
+    // Configurar el ancho de cada columna
+    tableCuentasT.getColumnModel().getColumn(0).setPreferredWidth(80);  // ID Temporal
+    tableCuentasT.getColumnModel().getColumn(1).setPreferredWidth(80);  // ID Cuenta
+    tableCuentasT.getColumnModel().getColumn(2).setPreferredWidth(150); // Nombre Cuenta
+    tableCuentasT.getColumnModel().getColumn(3).setPreferredWidth(100); // Fecha Asiento
+    tableCuentasT.getColumnModel().getColumn(4).setPreferredWidth(200); // Descripción Asiento
+    tableCuentasT.getColumnModel().getColumn(5).setPreferredWidth(80);  // Débito
+    tableCuentasT.getColumnModel().getColumn(6).setPreferredWidth(80);  // Crédito
+    tableCuentasT.getColumnModel().getColumn(7).setPreferredWidth(100); // Saldo Final
+    tableCuentasT.getColumnModel().getColumn(8).setPreferredWidth(150); // Fecha Generación
 }
 
   
@@ -147,6 +158,7 @@ public void cargarDatosEnTabla() {
     }
 }
 
+   
    
 
     /**
@@ -173,16 +185,20 @@ public void cargarDatosEnTabla() {
 
         tableCuentasT.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null}
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Id Cuenta T", "Id Cuenta Contable", "Mes", "Total Debitos", "Total Creditos", "Saldo Final", "Fecha de Generacion"
+                "Id Cuenta T", "Id Cuenta Contable", "Nombre Cuenta ", "Mes", "Descripcion Asiento", "Total Debitos", "Total Creditos", "Saldo Final", "Fecha de Generacion"
             }
         ));
         jScrollPane1.setViewportView(tableCuentasT);
+        if (tableCuentasT.getColumnModel().getColumnCount() > 0) {
+            tableCuentasT.getColumnModel().getColumn(0).setPreferredWidth(25);
+            tableCuentasT.getColumnModel().getColumn(1).setPreferredWidth(25);
+        }
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel1.setText("Cuentas T");
@@ -205,14 +221,11 @@ public void cargarDatosEnTabla() {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(13, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 837, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 14, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 862, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18))
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(359, 359, 359)
-                        .addComponent(btnGenerar))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(382, 382, 382)
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -228,7 +241,10 @@ public void cargarDatosEnTabla() {
                         .addGap(79, 79, 79)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(selectfechaFin, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(selectfechaFin, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(371, 371, 371)
+                        .addComponent(btnGenerar)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(

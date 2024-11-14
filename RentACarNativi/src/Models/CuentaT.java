@@ -105,10 +105,12 @@ public static ArrayList<CuentaT> cargarCuentasTemporales() {
             CuentaT cuenta = new CuentaT();
             cuenta.setIdTemporal(rs.getInt("id_temporal"));
             cuenta.setIdCuenta(rs.getInt("id_cuenta"));
+            cuenta.setNombreCuenta(rs.getString("nombre_cuenta"));
             cuenta.setFechaAsiento(rs.getDate("fecha_asiento"));
             cuenta.setDescripcionAsiento(rs.getString("descripcion_asiento"));
             cuenta.setDebito(rs.getDouble("debito"));
             cuenta.setCredito(rs.getDouble("credito"));
+            cuenta.setSaldoFinal(rs.getDouble("saldo_final"));
             cuenta.setFechaGeneracion(rs.getDate("fecha_generacion"));
             cuentasT.add(cuenta);
         }

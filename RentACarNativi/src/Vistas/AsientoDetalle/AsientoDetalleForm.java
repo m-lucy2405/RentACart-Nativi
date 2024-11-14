@@ -180,12 +180,12 @@ private void seleccionarRegistroTabla() {
     
     if (filaSeleccionada != -1) {
         // Obtener los datos de la fila seleccionada
-        int idAsientoSeleccionado = (int) tableModel.getValueAt(filaSeleccionada, 0);
-        String nombreAsientoSeleccionado = (String) tableModel.getValueAt(filaSeleccionada, 1);
-        int idCuentaSeleccionada = (int) tableModel.getValueAt(filaSeleccionada, 2);
-        String nombreCuentaSeleccionada = (String) tableModel.getValueAt(filaSeleccionada, 3);
-        double montoDebito = (double) tableModel.getValueAt(filaSeleccionada, 4);
-        double montoCredito = (double) tableModel.getValueAt(filaSeleccionada, 5);
+        int idAsientoSeleccionado = (int) tableModel.getValueAt(filaSeleccionada, 1);
+        String nombreAsientoSeleccionado = (String) tableModel.getValueAt(filaSeleccionada, 2);
+        int idCuentaSeleccionada = (int) tableModel.getValueAt(filaSeleccionada, 3);
+        String nombreCuentaSeleccionada = (String) tableModel.getValueAt(filaSeleccionada, 4);
+        double montoDebito = (double) tableModel.getValueAt(filaSeleccionada, 5);
+        double montoCredito = (double) tableModel.getValueAt(filaSeleccionada, 6);
         
         // Seleccionar el nombre del Asiento en el combobox `cmbAsiento` basado en el nombre
         for (int i = 0; i < cmbAsiento.getItemCount(); i++) {
