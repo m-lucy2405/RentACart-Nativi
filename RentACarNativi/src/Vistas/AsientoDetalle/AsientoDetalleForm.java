@@ -94,10 +94,11 @@ private void cargarDatos() {
     // Agregar filas con datos visibles en todas las columnas
     for (AsientoDetalle detalle : detalles) {
         tableModel.addRow(new Object[]{
-            detalle.getIdAsiento(),                    // ID del Asiento
-            mapaAsientos.get(detalle.getIdAsiento()),  // Nombre del Asiento
-            detalle.getIdCuenta(),                     // ID de la Cuenta
-            mapaCuentas.get(detalle.getIdCuenta()),    // Nombre de la Cuenta
+            detalle.getIdAsientoDetalle(),
+            detalle.getIdAsiento(),                    
+            mapaAsientos.get(detalle.getIdAsiento()),  
+            detalle.getIdCuenta(),                     
+            mapaCuentas.get(detalle.getIdCuenta()),    
             detalle.getMontoDebito(),
             detalle.getMontoCredito()
         });
@@ -243,13 +244,13 @@ private void seleccionarRegistroTabla() {
 
         tableDetalles.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null}
             },
             new String [] {
-                "Id Asiento Detalle", "Id Asiento", "Id Cuenta Contable", "Monto Debito", "Monto Credito"
+                "Id Asiento Detalle", "Id Asiento", "Asiento Contable", "Id Cuenta Contable", "Cuenta Contable", "Monto Debito", "Monto Credito"
             }
         ));
         tableDetalles.addMouseListener(new java.awt.event.MouseAdapter() {

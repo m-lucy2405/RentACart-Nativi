@@ -6,6 +6,7 @@ package Vistas.CuentaT;
 
 import Models.CuentaContable;
 import Models.CuentaT;
+import static Models.CuentaT.cargarCuentasTemporales;
 import com.toedter.calendar.JDateChooser;
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,25 +24,18 @@ public class CuentaTForm2 extends javax.swing.JFrame {
 
     private int idCuenta;
 
-    /**
-     * Creates new form CuentaTForm2
-     */
     
-   
-    private ArrayList<CuentaContable> cuentasT;  // Lista para almacenar las cuentas
+    
+    
     
     public CuentaTForm2() {
         initComponents();
-         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-         DefaultTableModel model = new DefaultTableModel();
-        model.addColumn("ID");
-        model.addColumn("Mes");
-        model.addColumn("Total Débitos");
-        model.addColumn("Total Créditos");
-        model.addColumn("Saldo Final");
-        model.addColumn("Fecha de Generación");
-        tableCuentasT.setModel(model);
-        cargarIdCuentasEnComboBox();
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        // Llamar a los métodos para cargar datos
+        cargarIdCuentasEnComboBox();  // Si estás utilizando un ComboBox para filtrar por cuenta
+        
+        
+        
         
         // Inicializar los componentes visuales
         JDateChooser selectfechaInicio = new JDateChooser(); 
@@ -96,15 +90,47 @@ public class CuentaTForm2 extends javax.swing.JFrame {
     int idCuenta = Integer.parseInt(cmbCuenta.getSelectedItem().toString());  // Suponiendo que es un ComboBox con el ID de cuenta
 
     // Lógica para generar las cuentas T temporales
-    CuentaT.borrarCuentasTemporales(idCuenta);  // Borra las cuentas temporales previas
+    CuentaT.borrarCuentasTemporales(idCuenta);
     CuentaT.generarCuentasTemporales(sqlFechaInicio, sqlFechaFin, idCuenta);  // Genera las nuevas cuentas temporales
-
+     
     // Cargar los datos en la tabla
-    cargarCuentasTemporales();
+     cargarDatosEnTabla();
+}
+   
+   // Método para cargar los datos en la tabla
+public void cargarDatosEnTabla() {
+    // Obtener los datos de la base de datos
+    ArrayList<CuentaT> cuentasT = cargarCuentasTemporales();
+
+    // Crear las columnas para el JTable
+    String[] columnNames = {"ID Temporal", "ID Cuenta", "Nombre Cuenta",  "Fecha Asiento", "Descripción Asiento", "Débito", "Crédito", "Saldo Final",  "Fecha Generación"};
+
+    // Crear el modelo de la tabla con las columnas y las filas
+    Object[][] rowData = new Object[cuentasT.size()][columnNames.length];
+
+    // Llenar los datos en el modelo
+    for (int i = 0; i < cuentasT.size(); i++) {
+        CuentaT cuenta = cuentasT.get(i);
+        rowData[i][0] = cuenta.getIdTemporal();
+        rowData[i][1] = cuenta.getIdCuenta();
+        rowData[i][2] = cuenta.getNombreCuenta();
+        rowData[i][3] = cuenta.getFechaAsiento();
+        rowData[i][4] = cuenta.getDescripcionAsiento();
+        rowData[i][5] = cuenta.getDebito();
+        rowData[i][6] = cuenta.getCredito();
+        rowData[i][7] = cuenta.getSaldoFinal();
+        rowData[i][8] = cuenta.getFechaGeneracion();
+        
+    }
+
+    // Crear un DefaultTableModel con los datos y columnas
+    DefaultTableModel model = new DefaultTableModel(rowData, columnNames);
+
+    // Asignar el modelo a la tabla
+    tableCuentasT.setModel(model);
 }
 
-
-
+  
     public void cargarIdCuentasEnComboBox() {
     // Obtener la lista de cuentas desde la base de datos
     ArrayList<CuentaContable> cuentas = (ArrayList<CuentaContable>) CuentaContable.obtenerCuentas();  // Método que obtiene todas las cuentas
@@ -121,31 +147,7 @@ public class CuentaTForm2 extends javax.swing.JFrame {
     }
 }
 
-    
-public void cargarCuentasTemporales() {
-    // Limpiar la tabla antes de cargar nuevos datos
-    DefaultTableModel model = (DefaultTableModel) tableCuentasT.getModel();
-    model.setRowCount(0);
-    
-    // Obtener las cuentas temporales
-         ArrayList<CuentaT> cuentasT = CuentaT.cargarCuentasTemporales(idCuenta);
-        for (CuentaT cuenta : cuentasT) {
-            model.addRow(new Object[]{
-                cuenta.getId(),
-                cuenta.getIdCuenta(),
-                cuenta.getMes(),
-                cuenta.getTotalDebitos(),
-                cuenta.getTotalCreditos(),
-                cuenta.getSaldoFinal(),
-                cuenta.getFechaGeneracion()
-            });
-        }
-}
-
-
-
-
-
+   
 
     /**
      * This method is called from within the constructor to initialize the form.

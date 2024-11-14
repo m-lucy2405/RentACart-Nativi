@@ -12,24 +12,40 @@ import java.util.Map.Entry;
 public class AsientoDetalle {
 
     // Atributos de la clase
+    private int idAsientoDetalle;
     private int idAsiento;
     private int idCuenta;
     private double montoDebito;
     private double montoCredito;
 
     // Constructor
-    public AsientoDetalle(int idAsiento, int idCuenta, double montoDebito, double montoCredito) {
+    public AsientoDetalle(int idAsientoDetalle, int idAsiento, int idCuenta, double montoDebito, double montoCredito) {
+        this.idAsientoDetalle = idAsientoDetalle;
         this.idAsiento = idAsiento;
         this.idCuenta = idCuenta;
         this.montoDebito = montoDebito;
         this.montoCredito = montoCredito;
     }
 
+    public AsientoDetalle(int idAsiento, int idCuenta, double montoDebito, double montoCredito) {
+       
+    }
+
     // Getters y Setters
+
+    public int getIdAsientoDetalle() {
+        return idAsientoDetalle;
+    }
+
+    public void setIdAsientoDetalle(int idAsientoDetalle) {
+        this.idAsientoDetalle = idAsientoDetalle;
+    }
+    
+    
     public int getIdAsiento() {
         return idAsiento;
     }
-
+    
     public void setIdAsiento(int idAsiento) {
         this.idAsiento = idAsiento;
     }
@@ -77,19 +93,21 @@ public class AsientoDetalle {
     // Método CRUD - Leer (Obtener todos los registros de detalle de asientos)
     public static List<AsientoDetalle> obtenerDetalles() {
         List<AsientoDetalle> detalles = new ArrayList<>();
-        String sql = "SELECT id_asiento, id_cuenta, monto_debito, monto_credito FROM detalle_asientos";  // Consulta SQL
+        String sql = "SELECT id_detalle_asiento, id_asiento, id_cuenta, monto_debito, monto_credito FROM detalle_asientos";
+
 
         try (Connection con = Conexion.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
+                int idAsientoDetalle = rs.getInt("id_detalle_asiento");
                 int idAsiento = rs.getInt("id_asiento");
                 int idCuenta = rs.getInt("id_cuenta");
                 double montoDebito = rs.getDouble("monto_debito");
                 double montoCredito = rs.getDouble("monto_credito");
                 
                 // Agregar el detalle a la lista
-                detalles.add(new AsientoDetalle(idAsiento, idCuenta, montoDebito, montoCredito));
+                detalles.add(new AsientoDetalle(idAsientoDetalle, idAsiento, idCuenta, montoDebito, montoCredito));
             }
         } catch (SQLException e) {
             e.printStackTrace();  // Manejo de errores
