@@ -1,75 +1,143 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Models;
 
-import java.util.Date;
+import Database.Conexion;
+import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- *
- * @author diego
- */
 public class AsientoContable {
-        private int id;
-        private Date fecha;
-        private String descripcion;
-        private double monto;
-        private CuentaContable cuenta;
+    // Atributos
+    private int idAsiento;
+    private java.util.Date fechaAsiento; // Utilizamos java.util.Date
+    private String descripcionAsiento;
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-    public AsientoContable(int id, Date fecha, String descripcion, double monto, CuentaContable cuenta) {
-        this.id = id;
-        this.fecha = fecha;
-        this.descripcion = descripcion;
-        this.monto = monto;
-        this.cuenta = cuenta;
+    // Constructor que recibe un java.util.Date
+    public AsientoContable(java.util.Date fecha, String descripcion) {
+        this.fechaAsiento = fecha;
+        this.descripcionAsiento = descripcion;
     }
 
-    public int getId() {
-        return id;
+    // Constructor que recibe la fecha como String y la convierte a java.util.Date
+    public AsientoContable(String fechaAsientoStr, String descripcionAsiento) throws ParseException {
+        this.fechaAsiento = dateFormat.parse(fechaAsientoStr); // Parseamos la fecha desde String
+        this.descripcionAsiento = descripcionAsiento;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    // Constructor que incluye idAsiento
+    public AsientoContable(int idAsiento, java.util.Date fechaAsiento, String descripcionAsiento) {
+        this.idAsiento = idAsiento;
+        this.fechaAsiento = fechaAsiento;
+        this.descripcionAsiento = descripcionAsiento;
     }
 
-    public Date getFecha() {
-        return fecha;
+    // Getters y Setters
+    public int getIdAsiento() { return idAsiento; }
+    public void setIdAsiento(int idAsiento) { this.idAsiento = idAsiento; }
+
+    // Obtener la fecha en formato String
+    public String getFechaAsiento() {
+        return dateFormat.format(fechaAsiento); // Devuelve la fecha como un String en el formato deseado
+    }
+    
+    // Setear la fecha con validación de formato
+    public void setFechaAsiento(String fechaAsiento) throws ParseException {
+        dateFormat.setLenient(false);
+        this.fechaAsiento = dateFormat.parse(fechaAsiento); // Usamos java.util.Date
     }
 
-    public void setFecha(Date fecha) {
-        this.fecha = fecha;
+    public String getDescripcionAsiento() { return descripcionAsiento; }
+    public void setDescripcionAsiento(String descripcionAsiento) { this.descripcionAsiento = descripcionAsiento; }
+
+    // Método para obtener todos los asientos contables
+    public static List<AsientoContable> obtenerAsientos() {
+        List<AsientoContable> asientos = new ArrayList<>();
+        String sql = "SELECT * FROM asientos_contables";
+
+        try (Connection conn = Conexion.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                int idAsiento = rs.getInt("id_asiento");
+                java.util.Date fecha = rs.getDate("fecha_asiento"); // Obtenemos la fecha como java.util.Date
+                String descripcion = rs.getString("descripcion_asiento");
+
+                asientos.add(new AsientoContable(idAsiento, fecha, descripcion));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return asientos;
     }
 
-    public String getDescripcion() {
-        return descripcion;
+    // Método para guardar el asiento contable en la base de datos
+    public void guardar() {
+        String sql = "INSERT INTO asientos_contables (fecha_asiento, descripcion_asiento) VALUES (?, ?)";
+        try (Connection conn = Conexion.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            // Convertir java.util.Date a java.sql.Date al insertar
+            stmt.setDate(1, new java.sql.Date(fechaAsiento.getTime())); // Convertir a java.sql.Date
+            stmt.setString(2, descripcionAsiento);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    // Método para actualizar un asiento
+    public void actualizar() throws SQLException {
+        String sql = "UPDATE asientos_contables SET fecha_asiento = ?, descripcion_asiento = ? WHERE id_asiento = ?";
+
+        try (Connection conn = Conexion.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            // Convertir java.util.Date a java.sql.Date al actualizar
+            stmt.setDate(1, new java.sql.Date(fechaAsiento.getTime())); // Convertir a java.sql.Date
+            stmt.setString(2, descripcionAsiento);
+            stmt.setInt(3, idAsiento);
+            stmt.executeUpdate();
+        }
     }
 
-    public double getMonto() {
-        return monto;
+    // Método para eliminar un asiento
+    public static boolean eliminarAsiento(int idAsiento) {
+        String sql = "DELETE FROM asientos_contables WHERE id_asiento = ?";
+
+        try (Connection conn = Conexion.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idAsiento);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
-    public void setMonto(double monto) {
-        this.monto = monto;
-    }
+    // Método para obtener un asiento por ID
+    public static AsientoContable obtenerAsientoPorId(int idAsiento) {
+        AsientoContable asiento = null;
+        String sql = "SELECT * FROM asientos_contables WHERE id_asiento = ?";
 
-    public CuentaContable getCuenta() {
-        return cuenta;
-    }
+        try (Connection conn = Conexion.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, idAsiento);
+            ResultSet rs = stmt.executeQuery();
 
-    public void setCuenta(CuentaContable cuenta) {
-        this.cuenta = cuenta;
-    }
+            if (rs.next()) {
+                java.util.Date fecha = rs.getDate("fecha_asiento"); // Obtener como java.util.Date
+                String descripcion = rs.getString("descripcion_asiento");
+                asiento = new AsientoContable(idAsiento, fecha, descripcion);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
-    @Override
-    public String toString() {
-        return "AsientoContable{" + "id=" + id + ", fecha=" + fecha + ", descripcion=" + descripcion + ", monto=" + monto + ", cuenta=" + cuenta + '}';
+        return asiento;
     }
-        
-        
-
 }
+
