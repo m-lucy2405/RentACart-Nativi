@@ -15,7 +15,7 @@ public class Usuario {
      private String contraseña;
      private String rol;
 
-    public Usuario(int id, String nombre, String contraseña, String rol) {
+    public Usuario(String nombre, String contraseña, String rol) {
         this.id = id;
         this.nombre = nombre;
         this.contraseña = contraseña;
@@ -25,6 +25,9 @@ public class Usuario {
     public Usuario() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
+
+    
+
 
     public int getId() {
         return id;
