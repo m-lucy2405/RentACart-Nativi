@@ -4,10 +4,6 @@
  */
 package Vistas.Principales;
 
-import Vistas.Admin.AsientoContableForm;
-import Vistas.Admin.AsientoDetalleForm;
-import Vistas.Admin.CuentaContableForm;
-import Vistas.Admin.CuentaTForm2;
 import javax.swing.JFrame;
 
 /**
