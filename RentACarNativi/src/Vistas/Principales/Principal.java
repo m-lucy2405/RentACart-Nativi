@@ -2,12 +2,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package Vista;
+package Vistas.Principales;
 
-import Vistas.AsientoContable.AsientoContableForm;
-import Vistas.AsientoDetalle.AsientoDetalleForm;
-import Vistas.CuentaContable.CuentaContableForm;
-import Vistas.CuentaT.CuentaTForm2;
+import Vistas.Admin.AsientoContableForm;
+import Vistas.Admin.AsientoDetalleForm;
+import Vistas.Admin.CuentaContableForm;
+import Vistas.Admin.CuentaTForm2;
 import javax.swing.JFrame;
 
 /**
