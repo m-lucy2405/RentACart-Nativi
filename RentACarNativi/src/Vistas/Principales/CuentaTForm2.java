@@ -31,8 +31,7 @@ public class CuentaTForm2 extends javax.swing.JFrame {
     public CuentaTForm2() {
         initComponents();
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        // Llamar a los métodos para cargar datos
-        cargarIdCuentasEnComboBox();  // Si estás utilizando un ComboBox para filtrar por cuenta
+       
         
         
         
@@ -86,16 +85,16 @@ public class CuentaTForm2 extends javax.swing.JFrame {
     java.sql.Date sqlFechaInicio = fechas[0];
     java.sql.Date sqlFechaFin = fechas[1];
 
-    // Obtener el idCuenta desde el campo o componente que ya tienes (ajusta esto según tu implementación)
-    int idCuenta = Integer.parseInt(cmbCuenta.getSelectedItem().toString());  // Suponiendo que es un ComboBox con el ID de cuenta
+    // Borrar todas las cuentas temporales existentes
+    CuentaT.borrarCuentasTemporales();
 
-    // Lógica para generar las cuentas T temporales
-    CuentaT.borrarCuentasTemporales(idCuenta);
-    CuentaT.generarCuentasTemporales(sqlFechaInicio, sqlFechaFin, idCuenta);  // Genera las nuevas cuentas temporales
-     
+    // Generar las cuentas temporales para el rango de fechas especificado
+    CuentaT.generarCuentasTemporales(sqlFechaInicio, sqlFechaFin);
+
     // Cargar los datos en la tabla
-     cargarDatosEnTabla();
+    cargarDatosEnTabla();
 }
+
    
    // Método para cargar los datos en la tabla
 public void cargarDatosEnTabla() {
@@ -142,21 +141,7 @@ public void cargarDatosEnTabla() {
 }
 
   
-    public void cargarIdCuentasEnComboBox() {
-    // Obtener la lista de cuentas desde la base de datos
-    ArrayList<CuentaContable> cuentas = (ArrayList<CuentaContable>) CuentaContable.obtenerCuentas();  // Método que obtiene todas las cuentas
-
-    // Limpiar el JComboBox antes de llenarlo
-    cmbCuenta.removeAllItems();
-
-    // Agregar una opción por defecto (si lo deseas)
-    cmbCuenta.addItem("Seleccione una cuenta");
-
-    // Recorrer la lista de cuentas y agregar cada idCuenta al JComboBox
-    for (CuentaContable cuenta : cuentas) {
-     cmbCuenta.addItem(String.valueOf(cuenta.getIdCuenta()));  // Convierte el ID de la cuenta a String
-    }
-}
+   
 
    
    
@@ -176,8 +161,6 @@ public void cargarDatosEnTabla() {
         btnGenerar = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        cmbCuenta = new javax.swing.JComboBox<>();
-        jLabel4 = new javax.swing.JLabel();
         selectfechaInicio = new com.toedter.calendar.JDateChooser();
         selectfechaFin = new com.toedter.calendar.JDateChooser();
 
@@ -214,8 +197,6 @@ public void cargarDatosEnTabla() {
 
         jLabel3.setText("Fecha Fin:");
 
-        jLabel4.setText("Id Cuenta:");
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -225,48 +206,39 @@ public void cargarDatosEnTabla() {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 862, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18))
             .addGroup(layout.createSequentialGroup()
+                .addGap(26, 26, 26)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(382, 382, 382)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(selectfechaFin, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(33, 33, 33)
+                        .addComponent(btnGenerar))
+                    .addComponent(selectfechaInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(129, 129, 129)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(cmbCuenta, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(94, 94, 94)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(6, 6, 6)
-                                .addComponent(selectfechaInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(73, 73, 73)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(selectfechaFin, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(371, 371, 371)
-                        .addComponent(btnGenerar)))
+                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(297, 297, 297)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel4))
+                .addContainerGap(9, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(selectfechaInicio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(24, 24, 24)
+                .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(cmbCuenta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(selectfechaInicio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(selectfechaFin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
-                .addComponent(btnGenerar)
-                .addGap(18, 18, 18)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnGenerar)
+                        .addGap(18, 18, 18))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(selectfechaFin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(29, 29, 29)))
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(12, 12, 12))
         );
@@ -315,11 +287,9 @@ public void cargarDatosEnTabla() {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGenerar;
-    private javax.swing.JComboBox<String> cmbCuenta;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
     private com.toedter.calendar.JDateChooser selectfechaFin;
     private com.toedter.calendar.JDateChooser selectfechaInicio;

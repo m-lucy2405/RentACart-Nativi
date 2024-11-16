@@ -66,7 +66,7 @@ public class CuentaT {
     public void setFechaGeneracion(Date fechaGeneracion) { this.fechaGeneracion = fechaGeneracion; }
 
    
-public static void generarCuentasTemporales(java.sql.Date fechaInicio, java.sql.Date fechaFin, int idCuenta) {
+public static void generarCuentasTemporales(java.sql.Date fechaInicio, java.sql.Date fechaFin) {
     String sql = "INSERT INTO cuentas_t_mensuales_temporal (id_cuenta, nombre_cuenta, fecha_asiento, descripcion_asiento, debito, credito, saldo_final) "
                + "SELECT d.id_cuenta, c.nombre_cuenta, a.fecha_asiento, a.descripcion_asiento, "
                + "COALESCE(d.monto_debito, 0) AS debito, COALESCE(d.monto_credito, 0) AS credito, "
@@ -74,22 +74,22 @@ public static void generarCuentasTemporales(java.sql.Date fechaInicio, java.sql.
                + "FROM detalle_asientos d "
                + "JOIN asientos_contables a ON d.id_asiento = a.id_asiento "
                + "JOIN cuentas_contables c ON d.id_cuenta = c.id_cuenta "
-               + "WHERE d.id_cuenta = ? AND a.fecha_asiento BETWEEN ? AND ? "
+               + "WHERE a.fecha_asiento BETWEEN ? AND ? "
                + "ORDER BY a.fecha_asiento;";
 
-    try (Connection conn = Conexion.getConnection(); 
+    try (Connection conn = Conexion.getConnection();
          PreparedStatement ps = conn.prepareStatement(sql)) {
-        
-        ps.setInt(1, idCuenta);
-        ps.setDate(2, fechaInicio);
-        ps.setDate(3, fechaFin);
-        
+
+        ps.setDate(1, fechaInicio);
+        ps.setDate(2, fechaFin);
+
         int filasInsertadas = ps.executeUpdate();
         System.out.println(filasInsertadas + " filas insertadas en cuentas_t_mensuales_temporal.");
     } catch (SQLException e) {
         System.out.println("Error al generar cuentas temporales: " + e.getMessage());
     }
 }
+
    
 
 
@@ -128,42 +128,19 @@ public static ArrayList<CuentaT> cargarCuentasTemporales() {
 
     
     
-    public static void borrarCuentasTemporales(int idCuenta) {
-    String sql = "DELETE FROM cuentas_t_mensuales_temporal WHERE id_cuenta = ?";
-    
-    try (Connection conn = Conexion.getConnection(); 
+   public static void borrarCuentasTemporales() {
+    String sql = "DELETE FROM cuentas_t_mensuales_temporal";
+
+    try (Connection conn = Conexion.getConnection();
          PreparedStatement ps = conn.prepareStatement(sql)) {
-        
-        ps.setInt(1, idCuenta);
+
         int filasBorradas = ps.executeUpdate();
         System.out.println("Cuentas temporales borradas: " + filasBorradas);
     } catch (SQLException e) {
         System.out.println("Error al borrar cuentas temporales: " + e.getMessage());
     }
 }
-    
-    public static ArrayList<CuentaContable> obtenerCuentas() {
-    ArrayList<CuentaContable> cuentas = new ArrayList<>();
-    String query = "SELECT id_cuenta FROM cuentas_contables";  // Ajusta esta consulta a la estructura de tu base de datos
-
-    try (Connection con = Conexion.getConnection();
-         PreparedStatement pst = con.prepareStatement(query);
-         ResultSet rs = pst.executeQuery()) {
-
-        // Iterar a través de los resultados de la consulta
-        while (rs.next()) {
-            int idCuenta = rs.getInt("id_cuenta");
-            cuentas.add(new CuentaContable(idCuenta));  // Crear un objeto Cuenta con el id y agregarlo a la lista
-        }
-
-    } catch (SQLException e) {
-        e.printStackTrace();  // Manejo de errores
-    }
-
-    return cuentas;
-}
-
-
+   
 }
 
 
