@@ -28,33 +28,30 @@ public class AsientoContablePanel extends javax.swing.JPanel {
        // Método para agregar un nuevo asiento contable
 private void guardarAsiento() {
     // Obteniendo los datos del formulario
-    String fechaAsientoStr = txtFechaAsiento.getText(); // Supongo que txtFechaAsiento es un JTextField con la fecha como String
+    java.util.Date fechaAsiento = selectFechaAsiento.getDate(); 
     String descripcionAsiento = txtDescripcionAsiento.getText();
 
-    // Convertir la fecha a un formato adecuado si es necesario
-    java.util.Date fechaAsiento = null;
-    try {
-        fechaAsiento = new SimpleDateFormat("dd/MM/yyyy").parse(fechaAsientoStr); // Parseamos la fecha del formato String a Date
-    } catch (ParseException e) {
-        JOptionPane.showMessageDialog(this, "Error en el formato de la fecha: " + e.getMessage());
-        return;  // Salimos si la fecha es incorrecta
+    // Validar que la fecha no sea null
+    if (fechaAsiento == null) {
+        JOptionPane.showMessageDialog(this, "Por favor, selecciona una fecha válida.");
+        return; 
     }
 
-    // Crear objeto AsientoContable con los datos del formulario
+    
     AsientoContable asiento = new AsientoContable(fechaAsiento, descripcionAsiento);
 
     try {
         if (idAsientoSeleccionado == 0) {
-            // Es un nuevo asiento contable, lo guardamos
+            
             asiento.guardar();
         } else {
-            // Si hay un ID, estamos actualizando un asiento existente
-            asiento.setIdAsiento(idAsientoSeleccionado);  // Asignamos el ID para la actualización
+           
+            asiento.setIdAsiento(idAsientoSeleccionado); 
             asiento.actualizar();
         }
         JOptionPane.showMessageDialog(this, "Asiento guardado exitosamente.");
-        limpiarCampos();  // Limpiar los campos del formulario
-        actualizarTabla();  // Recargar la tabla con los datos actualizados
+        limpiarCampos();  
+        actualizarTabla();  
     } catch (Exception e) {
         JOptionPane.showMessageDialog(this, "Error al guardar el asiento: " + e.getMessage());
     }
@@ -76,9 +73,9 @@ private void guardarAsiento() {
     int confirmacion = JOptionPane.showConfirmDialog(this, "¿Estás seguro de que deseas eliminar este asiento?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
     if (confirmacion == JOptionPane.YES_OPTION) {
         AsientoContable.eliminarAsiento(idAsiento);
-        cargarAsientosEnTabla();  // Actualizar la tabla después de eliminar
-        limpiarCampos();  // Limpiar los campos después de eliminar
-        idAsientoSeleccionado = -1;  // Resetear el ID
+        cargarAsientosEnTabla();  
+        limpiarCampos();  
+        idAsientoSeleccionado = -1;  
     }
 }
     
@@ -101,14 +98,16 @@ private void guardarAsiento() {
     }
 }
 
+// Método para cargar los datos de un asiento seleccionado en los campos del formulario
 private void cargarDatosAsiento(AsientoContable asientoSeleccionado) {
     // Supongo que AsientoContable tiene los métodos getFecha() y getDescripcion()
-    txtFechaAsiento.setText(asientoSeleccionado.getFechaAsiento());  // Fecha del asiento
+        
+        java.util.Date fechaAsiento = asientoSeleccionado.getFechaAsiento(); // Esto ya es tipo java.util.Date
+        selectFechaAsiento.setDate(fechaAsiento);
     txtDescripcionAsiento.setText(asientoSeleccionado.getDescripcionAsiento());  // Descripción del asiento
 }
-    
-    
-    // Método para cargar los datos de un asiento seleccionado en los campos del formulario
+
+// Método para cargar los datos del asiento seleccionado desde la tabla
 private void cargarAsientoSeleccionado() {
     int filaSeleccionada = tablaAsientos.getSelectedRow();
     if (filaSeleccionada == -1) {
@@ -121,10 +120,11 @@ private void cargarAsientoSeleccionado() {
     AsientoContable asiento = AsientoContable.obtenerAsientoPorId(idAsientoSeleccionado);
 
     if (asiento != null) {
-        txtFechaAsiento.setText(asiento.getFechaAsiento());
-        txtDescripcionAsiento.setText(asiento.getDescripcionAsiento());
+        selectFechaAsiento.setDate(asiento.getFechaAsiento());  // Establecer la fecha en el JDateChooser
+        txtDescripcionAsiento.setText(asiento.getDescripcionAsiento());  // Descripción del asiento
     }
 }
+
     
     private void cargarAsientosEnTabla() {
     List<AsientoContable> asientos = AsientoContable.obtenerAsientos();
@@ -147,15 +147,16 @@ private void cargarAsientoSeleccionado() {
     
     
     private void limpiarCampos() {
-    txtFechaAsiento.setText("");
-    txtDescripcionAsiento.setText("");
+    selectFechaAsiento.setDate(null);  
+    txtDescripcionAsiento.setText("");  
 }
+
     
     
     private void actualizarTabla() {
-    List<AsientoContable> cuentas = AsientoContable.obtenerAsientos();  // Obtener todas las cuentas
+    List<AsientoContable> cuentas = AsientoContable.obtenerAsientos();  
     DefaultTableModel modelo = (DefaultTableModel) tablaAsientos.getModel();
-    modelo.setRowCount(0);  // Limpiar la tabla
+    modelo.setRowCount(0);  
 
     for (AsientoContable cuenta : cuentas) {
         modelo.addRow(new Object[]{
@@ -181,12 +182,12 @@ private void cargarAsientoSeleccionado() {
         btnAgregar = new javax.swing.JButton();
         btnEditar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
-        txtFechaAsiento = new javax.swing.JTextField();
         txtDescripcionAsiento = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
+        selectFechaAsiento = new com.toedter.calendar.JDateChooser();
 
         tablaAsientos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -262,11 +263,11 @@ private void cargarAsientoSeleccionado() {
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addGap(40, 40, 40)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtDescripcionAsiento, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(txtDescripcionAsiento, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtFechaAsiento, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(selectFechaAsiento, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnEliminar)
@@ -294,7 +295,7 @@ private void cargarAsientoSeleccionado() {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtFechaAsiento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(selectFechaAsiento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(21, 21, 21)
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -337,8 +338,8 @@ private void cargarAsientoSeleccionado() {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private com.toedter.calendar.JDateChooser selectFechaAsiento;
     private javax.swing.JTable tablaAsientos;
     private javax.swing.JTextField txtDescripcionAsiento;
-    private javax.swing.JTextField txtFechaAsiento;
     // End of variables declaration//GEN-END:variables
 }

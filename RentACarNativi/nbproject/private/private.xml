@@ -3,11 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/diego/Documents/GitHub/RentACart-Nativi/RentACarNativi/src/Vistas/Admin/CuentaContablePanel.java</file>
             <file>file:/C:/Users/diego/Documents/GitHub/RentACart-Nativi/RentACarNativi/src/Vistas/Principales/Principal.java</file>
             <file>file:/C:/Users/diego/Documents/GitHub/RentACart-Nativi/RentACarNativi/src/Vistas/Admin/AsientoContablePanel.java</file>
-            <file>file:/C:/Users/diego/Documents/GitHub/RentACart-Nativi/RentACarNativi/src/Models/BalanceComprobacion.java</file>
-            <file>file:/C:/Users/diego/Documents/GitHub/RentACart-Nativi/RentACarNativi/src/Vistas/Admin/BalanceComprobacionPanel.java</file>
+            <file>file:/C:/Users/diego/Documents/GitHub/RentACart-Nativi/RentACarNativi/src/Models/AsientoContable.java</file>
         </group>
     </open-files>
 </project-private>

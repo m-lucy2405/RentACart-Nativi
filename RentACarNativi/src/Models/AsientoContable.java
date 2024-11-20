@@ -20,12 +20,6 @@ public class AsientoContable {
         this.descripcionAsiento = descripcion;
     }
 
-    // Constructor que recibe la fecha como String y la convierte a java.util.Date
-    public AsientoContable(String fechaAsientoStr, String descripcionAsiento) throws ParseException {
-        this.fechaAsiento = dateFormat.parse(fechaAsientoStr); // Parseamos la fecha desde String
-        this.descripcionAsiento = descripcionAsiento;
-    }
-
     // Constructor que incluye idAsiento
     public AsientoContable(int idAsiento, java.util.Date fechaAsiento, String descripcionAsiento) {
         this.idAsiento = idAsiento;
@@ -38,16 +32,22 @@ public class AsientoContable {
     public void setIdAsiento(int idAsiento) { this.idAsiento = idAsiento; }
 
     // Obtener la fecha en formato String
-    public String getFechaAsiento() {
-        return dateFormat.format(fechaAsiento); // Devuelve la fecha como un String en el formato deseado
-    }
-    
-    // Setear la fecha con validación de formato
-    public void setFechaAsiento(String fechaAsiento) throws ParseException {
-        dateFormat.setLenient(false);
-        this.fechaAsiento = dateFormat.parse(fechaAsiento); // Usamos java.util.Date
+    public java.util.Date getFechaAsiento() {
+    return fechaAsiento;  // Ya es un java.util.Date
+}
+
+
+    // Convertir java.util.Date a java.sql.Date
+    public java.sql.Date getSqlFechaAsiento() {
+        return new java.sql.Date(fechaAsiento.getTime()); // Para usar al insertar en la base de datos
     }
 
+    // Establecer la fecha del asiento
+    public void setFechaAsiento(java.util.Date fechaAsiento) {
+        this.fechaAsiento = fechaAsiento;
+    }
+
+    // Setear la descripción
     public String getDescripcionAsiento() { return descripcionAsiento; }
     public void setDescripcionAsiento(String descripcionAsiento) { this.descripcionAsiento = descripcionAsiento; }
 
@@ -79,8 +79,8 @@ public class AsientoContable {
         try (Connection conn = Conexion.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
-            // Convertir java.util.Date a java.sql.Date al insertar
-            stmt.setDate(1, new java.sql.Date(fechaAsiento.getTime())); // Convertir a java.sql.Date
+            // Usamos el método getSqlFechaAsiento() para convertir la fecha en formato adecuado
+            stmt.setDate(1, getSqlFechaAsiento()); 
             stmt.setString(2, descripcionAsiento);
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -95,8 +95,8 @@ public class AsientoContable {
         try (Connection conn = Conexion.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
-            // Convertir java.util.Date a java.sql.Date al actualizar
-            stmt.setDate(1, new java.sql.Date(fechaAsiento.getTime())); // Convertir a java.sql.Date
+            // Usamos el método getSqlFechaAsiento() para convertir la fecha en formato adecuado
+            stmt.setDate(1, getSqlFechaAsiento());
             stmt.setString(2, descripcionAsiento);
             stmt.setInt(3, idAsiento);
             stmt.executeUpdate();
@@ -140,4 +140,5 @@ public class AsientoContable {
         return asiento;
     }
 }
+
 
